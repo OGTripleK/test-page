@@ -1,23 +1,32 @@
 'use client'
 
-import { ShoppingCart, User, Settings2, Search, ChevronDown, X } from 'lucide-react'
+import { ShoppingCart, User, Settings2, Search, X } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { selectedCar, carOptions, type CarSelection } from '../data/navbarMock'
 
 export default function Navbar() {
-  const [currentCar, setCurrentCar] = useState<CarSelection>(selectedCar)
+  const [currentCar, setCurrentCar] = useState<CarSelection | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const dropdownRef = useRef<HTMLDivElement>(null)
+  const desktopDropdownRef = useRef<HTMLDivElement>(null)
+  const mobileDropdownRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
+      const target = event.target as Node
+
+      // If the click is inside either the desktop or mobile dropdown wrapper, do nothing
+      if (
+        desktopDropdownRef.current?.contains(target) ||
+        mobileDropdownRef.current?.contains(target)
+      ) {
+        return
       }
+
+      setIsDropdownOpen(false)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -35,6 +44,10 @@ export default function Navbar() {
       car.make?.toLowerCase().includes(query) ||
       car.title.toLowerCase().includes(query)
     )
+  }).sort((a, b) => {
+    if (currentCar && a.id === currentCar.id) return -1
+    if (currentCar && b.id === currentCar.id) return 1
+    return 0
   })
 
   const handleCarSelect = (car: CarSelection) => {
@@ -70,15 +83,15 @@ export default function Navbar() {
           </div>
           
           {/* Car Selection Box - Desktop Only */}
-          <div className="relative hidden lg:flex lg:flex-1 lg:max-w-md" ref={dropdownRef}>
+          <div className="relative hidden lg:flex lg:flex-1 lg:max-w-md" ref={desktopDropdownRef}>
             <motion.div 
               className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors w-full"
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-semibold text-black truncate">{currentCar.title}</h3>
-                  <p className="text-xs text-gray-600 truncate">{currentCar.subtitle}</p>
+                  <h3 className="text-sm font-semibold text-black truncate">{currentCar ? currentCar.title : 'ค้นหา'}</h3>
+                  <p className="text-xs text-gray-600 truncate">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
                 </div>
                 <div className="flex items-center space-x-2 ml-2">
                   <motion.button 
@@ -87,7 +100,6 @@ export default function Navbar() {
                   >
                     <Settings2 className="w-4 h-4 text-black" />
                   </motion.button>
-                  <ChevronDown className={`w-4 h-4 text-black transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </div>
               </div>
             </motion.div>
@@ -133,7 +145,7 @@ export default function Navbar() {
                           key={car.id}
                           onClick={() => handleCarSelect(car)}
                           className={`p-4 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                            car.id === currentCar.id 
+                            car.id === currentCar?.id 
                               ? 'bg-red-50 border-red-200 hover:bg-red-100' 
                               : 'hover:bg-gray-50'
                           }`}
@@ -155,7 +167,7 @@ export default function Navbar() {
                                 </span>
                               </div>
                             </div>
-                            {car.id === currentCar.id && (
+                            {car.id === currentCar?.id && (
                               <motion.div 
                                 className="text-[#E91C22] text-sm font-medium"
                                 initial={{ scale: 0 }}
@@ -203,15 +215,15 @@ export default function Navbar() {
       </div>
 
       {/* Car Selection Box - Mobile Only */}
-      <div className="relative w-full lg:hidden mt-3 px-4" ref={dropdownRef}>
+  <div className="relative w-full lg:hidden mt-3 px-4" ref={mobileDropdownRef}>
         <motion.div 
           className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors"
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-black">{currentCar.title}</h3>
-              <p className="text-sm text-gray-600">{currentCar.subtitle}</p>
+              <h3 className="text-lg font-semibold text-black">{currentCar ? currentCar.title : 'ค้นหา'}</h3>
+              <p className="text-sm text-gray-600">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
             </div>
             <div className="flex items-center space-x-2">
               <motion.button 
@@ -220,7 +232,6 @@ export default function Navbar() {
               >
                 <Settings2 className="w-5 h-5 text-black" />
               </motion.button>
-              <ChevronDown className={`w-5 h-5 text-black transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </div>
           </div>
         </motion.div>
@@ -266,7 +277,7 @@ export default function Navbar() {
                       key={car.id}
                       onClick={() => handleCarSelect(car)}
                       className={`p-4 cursor-pointer border-b border-gray-100 last:border-b-0 ${
-                        car.id === currentCar.id 
+                        car.id === currentCar?.id 
                           ? 'bg-red-50 border-red-200 hover:bg-red-100' 
                           : 'hover:bg-gray-50'
                       }`}
@@ -288,7 +299,7 @@ export default function Navbar() {
                             </span>
                           </div>
                         </div>
-                        {car.id === currentCar.id && (
+                        {car.id === currentCar?.id && (
                           <motion.div 
                             className="text-[#E91C22] text-sm font-medium"
                             initial={{ scale: 0 }}
