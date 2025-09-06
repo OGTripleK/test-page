@@ -49,8 +49,8 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile car select inside navbar */}
-        <div className="mt-4">
+        {/* Mobile car select inside navbar for mobile only!! */}
+        <div className="mt-4 md:mt-0">
           <CarSelectMobile />
         </div>
         </div>
