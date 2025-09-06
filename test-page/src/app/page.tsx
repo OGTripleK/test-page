@@ -1,11 +1,10 @@
-'use client'
-
-import {Button} from "@heroui/react";
+import Navbar from '../components/Navbar'
 
 export default function Home() {
   return (
-    <div className="flex items-center justify-center min-h-screen">
-      <Button>Click me</Button>
+    <div className="bg-white min-h-screen">
+      <Navbar />
     </div>
   );
 }
+
