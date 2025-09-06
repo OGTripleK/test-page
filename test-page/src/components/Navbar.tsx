@@ -4,7 +4,7 @@ import { ShoppingCart, User, Settings2, Search, X } from 'lucide-react'
 import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { selectedCar, carOptions, type CarSelection } from '../data/navbarMock'
+import { carOptions, type CarSelection } from '../data/navbarMock'
 
 export default function Navbar() {
   const [currentCar, setCurrentCar] = useState<CarSelection | null>(null)
@@ -90,7 +90,7 @@ export default function Navbar() {
             >
               <div className="flex items-center justify-between">
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-sm font-semibold text-black truncate">{currentCar ? currentCar.title : 'ค้นหา'}</h3>
+                  <h3 className="text-sm font-semibold text-black truncate">{currentCar ? currentCar.title : 'ค้นหายางตามรุ่นรถ'}</h3>
                   <p className="text-xs text-gray-600 truncate">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
                 </div>
                 <div className="flex items-center space-x-2 ml-2">
@@ -222,7 +222,7 @@ export default function Navbar() {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-black">{currentCar ? currentCar.title : 'ค้นหา'}</h3>
+              <h3 className="text-lg font-semibold text-black">{currentCar ? currentCar.title : 'ค้นหายางตามรุ่นรถ'}</h3>
               <p className="text-sm text-gray-600">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
             </div>
             <div className="flex items-center space-x-2">

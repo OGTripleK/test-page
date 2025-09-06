@@ -12,22 +12,8 @@ export type CarSelection = {
   selected?: boolean
 }
 
-export const selectedCar: CarSelection = {
-  id: 'car-1',
-  title: '2025 Honda Accord EX',
-  make: 'Honda',
-  model: 'Accord',
-  trim: 'EX',
-  subtitle: 'ขนาดยาง 225/50R17',
-  year: 2025,
-  tireSize: '225/50R17',
-  color: 'Modern Steel Metallic',
-  mileageKm: 15000,
-  selected: true,
-}
-
 export const carOptions: CarSelection[] = [
-  selectedCar,
+  { id: 'car-1', title: '2025 Honda Accord EX', make: 'Honda', model: 'Accord', trim: 'EX', subtitle: 'ขนาดยาง 225/50R17', year: 2025, tireSize: '225/50R17', color: 'Modern Steel Metallic', mileageKm: 15000 },
   { id: 'car-2', title: '2020 Toyota Corolla G', make: 'Toyota', model: 'Corolla', trim: 'G', subtitle: 'ขนาดยาง 195/65R15', year: 2020, tireSize: '195/65R15', color: 'White', mileageKm: 42000 },
   { id: 'car-3', title: '2019 BMW 3 Series 330i', make: 'BMW', model: '3 Series', trim: '330i', subtitle: 'ขนาดยาง 225/45R18', year: 2019, tireSize: '225/45R18', color: 'Alpine White', mileageKm: 68000 },
   { id: 'car-4', title: '2022 Tesla Model 3 Standard', make: 'Tesla', model: 'Model 3', trim: 'Standard', subtitle: 'ขนาดยาง 235/45R18', year: 2022, tireSize: '235/45R18', color: 'Black', mileageKm: 12000 },
