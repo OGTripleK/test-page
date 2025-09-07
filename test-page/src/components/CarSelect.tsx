@@ -289,29 +289,105 @@ export function CarSelectMobile() {
   const scrollDirection = useScrollDirection()
   const [isVisible, setIsVisible] = useState(true)
   const [forceVisible, setForceVisible] = useState(false)
+  const touchMovedRef = useRef(false)
+  const isScrollingRef = useRef(false)
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null)
 
   useEffect(() => {
+    // Immediate collapse on any downward scroll to support short swipes.
     if (scrollDirection === 'down' && !isDropdownOpen && !forceVisible) {
-      // Collapse immediately on scroll down for better mobile UX
       setIsVisible(false)
     } else if (scrollDirection === 'up' || isDropdownOpen || forceVisible) {
       setIsVisible(true)
     }
   }, [scrollDirection, isDropdownOpen, forceVisible])
 
-  // Reset force visible after dropdown closes - faster reset for better UX
+  // Reset force visible immediately after dropdown closes
   useEffect(() => {
     if (!isDropdownOpen) {
-      const timer = setTimeout(() => setForceVisible(false), 300) // Reduced from 500ms
-      return () => clearTimeout(timer)
+      setForceVisible(false)
     }
   }, [isDropdownOpen])
 
-  const handleCarSelectClick = () => {
+  // Track native scrolling to avoid accidental toggles while user is scrolling quickly
+  useEffect(() => {
+    const onScroll = () => {
+      // Mark scrolling for the current frame only to avoid blocking taps longer than necessary
+      isScrollingRef.current = true
+      window.requestAnimationFrame(() => {
+        isScrollingRef.current = false
+      })
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [])
+
+  const handleCarSelectClick = (e?: React.MouseEvent) => {
+    // If a touch/move or native scroll was detected recently, treat this as a scroll, not a tap
+    if (touchMovedRef.current || isScrollingRef.current) {
+      // stop propagation for safety when called from a synthetic click after touch
+      e?.stopPropagation?.()
+      return
+    }
+
     if (!isVisible) {
       setForceVisible(true)
     }
     setIsDropdownOpen(!isDropdownOpen)
+  }
+
+  const onTouchStart = (ev: React.TouchEvent) => {
+    touchMovedRef.current = false
+    const t = ev.touches && ev.touches[0]
+    if (t) touchStartRef.current = { x: t.clientX, y: t.clientY, t: performance.now() }
+  }
+
+  const onTouchMove = (ev: React.TouchEvent) => {
+    if (!touchStartRef.current) return
+    const t = ev.touches && ev.touches[0]
+    if (!t) return
+    const dx = t.clientX - touchStartRef.current.x
+    const dy = t.clientY - touchStartRef.current.y
+    // very small threshold: treat any vertical movement >= 1px as a swipe
+    if (Math.abs(dy) >= 1) {
+      touchMovedRef.current = true
+    }
+    // update last known position so short swipes are captured on end
+    touchStartRef.current = { x: touchStartRef.current.x, y: touchStartRef.current.y, t: touchStartRef.current.t }
+    // store last move position on the event target for end calculation via changedTouches
+  }
+
+  const onTouchEnd = (ev: React.TouchEvent) => {
+    const changed = ev.changedTouches && ev.changedTouches[0]
+    const start = touchStartRef.current
+    if (changed && start) {
+      const endY = changed.clientY
+      const dy = endY - start.y
+
+      // Any vertical movement (even small) should control visibility by direction
+      if (Math.abs(dy) >= 1) {
+        if (dy > 0) {
+          // finger moved down -> expand
+          setIsVisible(true)
+        } else {
+          // finger moved up -> collapse
+          setIsVisible(false)
+        }
+        touchMovedRef.current = true
+      }
+    }
+
+    // Suppress the synthetic click for a single frame when a move happened
+    if (touchMovedRef.current) {
+      window.requestAnimationFrame(() => {
+        touchMovedRef.current = false
+      })
+    }
+
+    touchStartRef.current = null
   }
 
   return (
@@ -335,7 +411,10 @@ export function CarSelectMobile() {
     >
       <motion.div 
         className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors"
-        onClick={handleCarSelectClick}
+        onClick={(e) => handleCarSelectClick(e)}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
         animate={{ 
           scale: isVisible ? 1 : 0.95,
           y: isVisible ? 0 : -10
