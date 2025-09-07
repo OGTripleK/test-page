@@ -8,7 +8,7 @@ import type { SharedSelection } from '@heroui/react'
 // Options are derived dynamically from available products (not hardcoded)
 
 export default function TyreFilter() {
-  const { selectedCar, tyreFilterSelections, setTyreFilterSelections, filteredProducts } = useFilterBar()
+  const { selectedCar, tyreFilterSelections, setTyreFilterSelections, filteredProducts, allCarProducts } = useFilterBar()
 
   // Don't show tyre filter if no car is selected
   if (!selectedCar) return null
@@ -37,8 +37,8 @@ export default function TyreFilter() {
     })
   }
 
-  // Derive options dynamically from filteredProducts
-  const tireBrands = Array.from(new Set(filteredProducts.map(p => p.brand))).map(b => ({ key: b.toLowerCase(), label: b }))
+  // Derive options dynamically from allCarProducts
+  const tireBrands = Array.from(new Set(allCarProducts.map(p => p.brand))).map(b => ({ key: b.toLowerCase(), label: b }))
 
   // Determine which price ranges are actually represented in the products
   const PRICE_BUCKETS = [
@@ -51,7 +51,7 @@ export default function TyreFilter() {
   ]
 
   const priceRanges = PRICE_BUCKETS.filter(bucket =>
-    filteredProducts.some(p => p.price >= bucket.min && p.price <= bucket.max)
+    allCarProducts.some(p => p.price >= bucket.min && p.price <= bucket.max)
   )
 
   // Features are mapped via same map used in FilterBar.tsx so options are consistent
@@ -77,11 +77,11 @@ export default function TyreFilter() {
 
     const tags = tagMap[f.key] || []
     if (tags.length > 0) {
-      return filteredProducts.some(p => p.tags?.some(t => tags.includes(t)))
+      return allCarProducts.some(p => p.tags?.some(t => tags.includes(t)))
     }
 
     // attribute-based features (require attribute >= 4)
-    const attributeMap: { [k: string]: keyof typeof filteredProducts[number]['attributes'] } = {
+    const attributeMap: { [k: string]: keyof typeof allCarProducts[number]['attributes'] } = {
       'wet-grip': 'handling',
       'low-noise': 'noise',
       'long-lasting': 'durability',
@@ -90,7 +90,7 @@ export default function TyreFilter() {
     }
 
     const attr = attributeMap[f.key]
-    if (attr) return filteredProducts.some(p => (p.attributes[attr] || 0) >= 4)
+    if (attr) return allCarProducts.some(p => (p.attributes[attr] || 0) >= 4)
 
     return false
   })

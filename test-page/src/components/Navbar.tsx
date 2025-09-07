@@ -6,9 +6,12 @@ import { motion } from 'framer-motion'
 import CarSelectDesktop, { CarSelectMobile, useCarSelect } from './CarSelect'
 import FilterBar from './FilterBar'
 import TyreFilter from './TyreFilter'
+import { useCart } from '../app/providers'
 
 export default function Navbar() {
   const { clearCar } = useCarSelect()
+  const { getTotalItems } = useCart()
+  const cartItemCount = getTotalItems()
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -41,10 +44,15 @@ export default function Navbar() {
         {/* Right side icons */}
         <div className="flex items-center space-x-4">
           <motion.button 
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors relative"
             whileTap={{ scale: 0.95 }}
           >
             <ShoppingCart className="w-5 h-5 text-black fill-black" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                {cartItemCount > 99 ? '99+' : cartItemCount}
+              </span>
+            )}
           </motion.button>
           <motion.button 
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"

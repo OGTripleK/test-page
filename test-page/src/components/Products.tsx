@@ -6,6 +6,8 @@ import { CircularProgress } from '@heroui/react'
 import { useFilterBar } from './FilterBar'
 import { TireProduct } from '../data/pageMock'
 import { CarSelection } from '../data/navbarMock'
+import { useCart } from '../app/providers'
+import { useState } from 'react'
 
 type FilterType = 'all' | 'popular' | 'price_low_high' | 'price_high_low'
 
@@ -16,6 +18,10 @@ interface ProductsProps {
 }
 
 function ProductCard({ product }: { product: TireProduct }) {
+  const { addToCart } = useCart()
+  const [isAdding, setIsAdding] = useState(false)
+  const [added, setAdded] = useState(false)
+  
   const discountAmount = product.oldPrice ? product.oldPrice - product.price : 0
   
   // Determine attribute labels in Thai
@@ -34,10 +40,22 @@ function ProductCard({ product }: { product: TireProduct }) {
   const mainAttributes = Object.entries(product.attributes)
     .filter(([_, value]) => value && value > 0)
     .slice(0, 5)
+
+  const handleAddToCart = async () => {
+    setIsAdding(true)
+    addToCart(product)
+    setAdded(true)
+    setIsAdding(false)
+    
+    // Reset the added state after 2 seconds
+    setTimeout(() => {
+      setAdded(false)
+    }, 2000)
+  }
   
   return (
     <motion.div
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
+      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col min-h-[500px]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -96,7 +114,7 @@ function ProductCard({ product }: { product: TireProduct }) {
         />
       </div>
 
-      <div className="p-4 space-y-3">
+      <div className="p-4 space-y-3 flex-grow">
         {/* Brand Logo */}
         <div className="flex justify-start">
           <div className="h-4">
@@ -109,7 +127,7 @@ function ProductCard({ product }: { product: TireProduct }) {
         </div>
 
         {/* Product Name */}
-        <h3 className="font-semibold text-gray-900 text-base leading-tight">{product.name}</h3>
+        <h3 className="font-bold text-gray-900 text-base leading-tight">{product.name}</h3>
 
         {/* Star Rating */}
         <div className="flex items-center gap-2">
@@ -161,30 +179,61 @@ function ProductCard({ product }: { product: TireProduct }) {
         {/* Price */}
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-red-600 font-bold text-xl">
+            <span className={`font-bold text-xl ${product.oldPrice ? 'text-red-600' : 'text-black'}`}>
               ฿ {product.price.toLocaleString()}/เส้น
             </span>
             {product.oldPrice && (
-              <span className="text-gray-400 line-through text-sm">
-                ฿ {product.oldPrice.toLocaleString()}
-              </span>
+              <>
+                <span className="text-gray-400 line-through text-sm">
+                  ฿ {product.oldPrice.toLocaleString()}
+                </span>
+                {product.discountPercent && (
+                  <div className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded-full ml-2">
+                    -{product.discountPercent}%
+                  </div>
+                )}
+              </>
             )}
           </div>
-          {product.discountPercent && (
-            <div className="inline-block bg-red-600 text-white text-xs px-2 py-1 rounded">
-              -{product.discountPercent}%
-            </div>
-          )}
         </div>
+      </div>
 
-        {/* Add to Cart Button */}
-        <button className="w-full bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-900 transition-colors flex items-center justify-center gap-2">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="9" cy="21" r="1"/>
-            <circle cx="20" cy="21" r="1"/>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-          </svg>
-          เพิ่มไปยังรถเข็น
+      {/* Add to Cart Button - Anchored to bottom */}
+      <div className="p-4 pt-0">
+        <button 
+          onClick={handleAddToCart}
+          disabled={isAdding}
+          className={`w-full py-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+            added 
+              ? 'bg-green-600 text-white hover:bg-green-700' 
+              : 'bg-gray-800 text-white hover:bg-gray-900'
+          } ${isAdding ? 'opacity-75 cursor-not-allowed' : ''}`}
+        >
+          {isAdding ? (
+            <>
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              กำลังเพิ่ม...
+            </>
+          ) : added ? (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="20,6 9,17 4,12"></polyline>
+              </svg>
+              เพิ่มแล้ว
+            </>
+          ) : (
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              เพิ่มไปยังรถเข็น
+            </>
+          )}
         </button>
       </div>
     </motion.div>

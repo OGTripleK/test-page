@@ -20,6 +20,7 @@ type FilterBarContextValue = {
   tyreFilterSelections: TyreFilterSelections
   setTyreFilterSelections: (selections: TyreFilterSelections) => void
   filteredProducts: TireProduct[]
+  allCarProducts: TireProduct[]
   selectedCar: CarSelection | null
   filterCounts: { all: number; popular: number; price_low_high: number; price_high_low: number }
 }
@@ -218,6 +219,11 @@ export function FilterBarProvider({
   const filteredProducts = getFilteredProducts()
   const filterCounts = getFilterCounts()
 
+  // Get all products for the selected car (without tyre filter selections)
+  const allCarProducts = selectedCar 
+    ? products.filter(product => product.compatibleTireSize === selectedCar.tireSize)
+    : []
+
   return (
     <FilterBarContext.Provider value={{
       selectedFilter,
@@ -225,6 +231,7 @@ export function FilterBarProvider({
       tyreFilterSelections,
       setTyreFilterSelections,
       filteredProducts,
+      allCarProducts,
       selectedCar,
       filterCounts,
     }}>
