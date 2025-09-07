@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useRef, useEffect, type ReactNode 
 import { motion, AnimatePresence } from 'framer-motion'
 import { type CarSelection } from '../data/navbarMock'
 
-// Custom hook for scroll direction detection
+// Custom hook for scroll direction detection with mobile-optimized thresholds
 function useScrollDirection() {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -15,7 +15,10 @@ function useScrollDirection() {
       const scrollY = window.scrollY
       const direction = scrollY > lastScrollY ? 'down' : 'up'
       
-      if (direction !== scrollDirection && (scrollY - lastScrollY > 10 || scrollY - lastScrollY < -10)) {
+      // Reduced threshold for more responsive mobile behavior - collapse faster on scroll down
+      const threshold = direction === 'down' ? 5 : 10 // More sensitive to downward scroll
+      
+      if (direction !== scrollDirection && (scrollY - lastScrollY > threshold || scrollY - lastScrollY < -threshold)) {
         setScrollDirection(direction)
       }
       setLastScrollY(scrollY > 0 ? scrollY : 0)
@@ -289,16 +292,17 @@ export function CarSelectMobile() {
 
   useEffect(() => {
     if (scrollDirection === 'down' && !isDropdownOpen && !forceVisible) {
+      // Collapse immediately on scroll down for better mobile UX
       setIsVisible(false)
     } else if (scrollDirection === 'up' || isDropdownOpen || forceVisible) {
       setIsVisible(true)
     }
   }, [scrollDirection, isDropdownOpen, forceVisible])
 
-  // Reset force visible after dropdown closes
+  // Reset force visible after dropdown closes - faster reset for better UX
   useEffect(() => {
     if (!isDropdownOpen) {
-      const timer = setTimeout(() => setForceVisible(false), 500)
+      const timer = setTimeout(() => setForceVisible(false), 300) // Reduced from 500ms
       return () => clearTimeout(timer)
     }
   }, [isDropdownOpen])
@@ -321,11 +325,11 @@ export function CarSelectMobile() {
         opacity: isVisible ? 1 : 0
       }}
       transition={{ 
-        duration: 0.3, 
-        ease: "easeInOut",
-        height: { duration: 0.3 },
-        marginTop: { duration: 0.3 },
-        opacity: { duration: 0.2 }
+        duration: isVisible ? 0.25 : 0.15, // Faster collapse, slightly slower expand
+        ease: isVisible ? "easeOut" : "easeIn", // Different easing for expand vs collapse
+        height: { duration: isVisible ? 0.25 : 0.15 },
+        marginTop: { duration: isVisible ? 0.25 : 0.15 },
+        opacity: { duration: isVisible ? 0.2 : 0.1 } // Very fast opacity change
       }}
       style={{ overflow: isVisible ? 'visible' : 'hidden' }}
     >
@@ -336,7 +340,10 @@ export function CarSelectMobile() {
           scale: isVisible ? 1 : 0.95,
           y: isVisible ? 0 : -10
         }}
-        transition={{ duration: 0.2, ease: "easeOut" }}
+        transition={{ 
+          duration: isVisible ? 0.2 : 0.1, // Faster scale/position change when collapsing
+          ease: "easeOut" 
+        }}
       >
         <div className="flex items-center justify-between">
           <div>
