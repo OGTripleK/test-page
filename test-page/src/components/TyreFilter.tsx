@@ -85,11 +85,12 @@ export default function TyreFilter() {
               trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
-              selectorIcon: "text-black"
+              selectorIcon: "text-black",
+              popoverContent: "w-fit"
             }}
           >
             {tireBrands.map((brand) => (
-              <SelectItem key={brand.key} className="text-black">{brand.label}</SelectItem>
+              <SelectItem key={brand.key} className="text-black whitespace-nowrap">{brand.label}</SelectItem>
             ))}
           </Select>
 
@@ -103,11 +104,12 @@ export default function TyreFilter() {
               trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
-              selectorIcon: "text-black"
+              selectorIcon: "text-black",
+              popoverContent: "w-fit"
             }}
           >
             {priceRanges.map((price) => (
-              <SelectItem key={price.key} className="text-black">{price.label}</SelectItem>
+              <SelectItem key={price.key} className="text-black whitespace-nowrap">{price.label}</SelectItem>
             ))}
           </Select>
 
@@ -121,11 +123,12 @@ export default function TyreFilter() {
               trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
-              selectorIcon: "text-black"
+              selectorIcon: "text-black",
+              popoverContent: "w-fit"
             }}
           >
             {features.map((feature) => (
-              <SelectItem key={feature.key} className="text-black">{feature.label}</SelectItem>
+              <SelectItem key={feature.key} className="text-black whitespace-nowrap">{feature.label}</SelectItem>
             ))}
           </Select>
         </div>
