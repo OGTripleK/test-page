@@ -8,9 +8,17 @@ import { CarSelection } from '../data/navbarMock'
 
 type FilterType = 'all' | 'popular' | 'price_low_high' | 'price_high_low'
 
+type TyreFilterSelections = {
+  brand: string | null
+  priceRange: string | null
+  feature: string | null
+}
+
 type FilterBarContextValue = {
   selectedFilter: FilterType
   setSelectedFilter: (filter: FilterType) => void
+  tyreFilterSelections: TyreFilterSelections
+  setTyreFilterSelections: (selections: TyreFilterSelections) => void
   filteredProducts: TireProduct[]
   selectedCar: CarSelection | null
   filterCounts: { all: number; popular: number; price_low_high: number; price_high_low: number }
@@ -28,6 +36,11 @@ export function FilterBarProvider({
   selectedCar: CarSelection | null
 }) {
   const [selectedFilter, setSelectedFilter] = useState<FilterType>('all')
+  const [tyreFilterSelections, setTyreFilterSelections] = useState<TyreFilterSelections>({
+    brand: null,
+    priceRange: null,
+    feature: null
+  })
 
   const getFilteredProducts = (): TireProduct[] => {
     if (!selectedCar) return []
@@ -36,6 +49,73 @@ export function FilterBarProvider({
     let carProducts = products.filter(product => 
       product.compatibleTireSize === selectedCar.tireSize
     )
+
+    // Apply TyreFilter selections
+    if (tyreFilterSelections.brand) {
+      carProducts = carProducts.filter(product => 
+        product.brand.toLowerCase() === tyreFilterSelections.brand!.toLowerCase()
+      )
+    }
+
+    if (tyreFilterSelections.priceRange) {
+      const range = tyreFilterSelections.priceRange
+      let min = 0, max = Infinity
+      
+      if (range === '0-2000') {
+        max = 2000
+      } else if (range === '2000-4000') {
+        min = 2000
+        max = 4000
+      } else if (range === '4000-6000') {
+        min = 4000
+        max = 6000
+      } else if (range === '6000-8000') {
+        min = 6000
+        max = 8000
+      } else if (range === '8000-10000') {
+        min = 8000
+        max = 10000
+      } else if (range === '10000+') {
+        min = 10000
+      }
+      
+      carProducts = carProducts.filter(product => 
+        product.price >= min && product.price <= max
+      )
+    }
+
+    if (tyreFilterSelections.feature) {
+      carProducts = carProducts.filter(product => {
+        const featureMap: { [key: string]: string[] } = {
+          'eco-friendly': ['ประหยัดน้ำมัน'],
+          'wet-grip': [], // No specific tag for wet grip
+          'low-noise': [], // No specific tag for low noise
+          'long-lasting': [], // No specific tag for durability
+          'all-season': [], // No specific tag for all-season
+          'sport': ['Performance'],
+          'comfort': [], // No specific tag for comfort
+          'off-road': ['All Terrain', 'SUV', 'Pickup']
+        }
+        
+        const tags = featureMap[tyreFilterSelections.feature!] || []
+        
+        // If no specific tags, filter by attributes
+        if (tags.length === 0) {
+          const attributeMap: { [key: string]: keyof TireProduct['attributes'] } = {
+            'wet-grip': 'handling',
+            'low-noise': 'noise',
+            'long-lasting': 'durability',
+            'all-season': 'comfort',
+            'comfort': 'comfort'
+          }
+          
+          const attribute = attributeMap[tyreFilterSelections.feature!]
+          return attribute && product.attributes[attribute] && product.attributes[attribute]! >= 4
+        }
+        
+        return tags.some(tag => product.tags?.includes(tag))
+      })
+    }
 
     // Apply sorting based on selected filter
     switch (selectedFilter) {
@@ -61,11 +141,77 @@ export function FilterBarProvider({
       product.compatibleTireSize === selectedCar.tireSize
     )
 
+    // Apply TyreFilter selections to base counts
+    let filteredProducts = carProducts
+    if (tyreFilterSelections.brand) {
+      filteredProducts = filteredProducts.filter(product => 
+        product.brand.toLowerCase() === tyreFilterSelections.brand!.toLowerCase()
+      )
+    }
+    if (tyreFilterSelections.priceRange) {
+      // Apply same price filtering logic
+      const range = tyreFilterSelections.priceRange
+      let min = 0, max = Infinity
+      
+      if (range === '0-2000') {
+        max = 2000
+      } else if (range === '2000-4000') {
+        min = 2000
+        max = 4000
+      } else if (range === '4000-6000') {
+        min = 4000
+        max = 6000
+      } else if (range === '6000-8000') {
+        min = 6000
+        max = 8000
+      } else if (range === '8000-10000') {
+        min = 8000
+        max = 10000
+      } else if (range === '10000+') {
+        min = 10000
+      }
+      
+      filteredProducts = filteredProducts.filter(product => 
+        product.price >= min && product.price <= max
+      )
+    }
+    if (tyreFilterSelections.feature) {
+      filteredProducts = filteredProducts.filter(product => {
+        const featureMap: { [key: string]: string[] } = {
+          'eco-friendly': ['ประหยัดน้ำมัน'],
+          'wet-grip': [],
+          'low-noise': [],
+          'long-lasting': [],
+          'all-season': [],
+          'sport': ['Performance'],
+          'comfort': [],
+          'off-road': ['All Terrain', 'SUV', 'Pickup']
+        }
+        
+        const tags = featureMap[tyreFilterSelections.feature!] || []
+        
+        if (tags.length === 0) {
+          const attributeMap: { [key: string]: keyof TireProduct['attributes'] } = {
+            'wet-grip': 'handling',
+            'low-noise': 'noise',
+            'long-lasting': 'durability',
+            'all-season': 'comfort',
+            'comfort': 'comfort'
+          }
+          
+          const attribute = attributeMap[tyreFilterSelections.feature!]
+          return attribute && product.attributes[attribute] && product.attributes[attribute]! >= 4
+        }
+        
+        return tags.some(tag => product.tags?.includes(tag))
+      })
+    }
+
     return {
-      all: carProducts.length,
-      popular: carProducts.filter(product => product.isPopular).length,
-      price_low_high: carProducts.length,
-      price_high_low: carProducts.length,
+      all: filteredProducts.length,
+      popular: filteredProducts.filter(product => product.isPopular).length,
+      price_low_high: filteredProducts.length,
+      price_high_low: filteredProducts.length,
     }
   }
 
@@ -76,6 +222,8 @@ export function FilterBarProvider({
     <FilterBarContext.Provider value={{
       selectedFilter,
       setSelectedFilter,
+      tyreFilterSelections,
+      setTyreFilterSelections,
       filteredProducts,
       selectedCar,
       filterCounts,
@@ -131,6 +279,7 @@ export default function FilterBar() {
           </Tabs>
         </div>
       </div>
+      
     </motion.div>
   )
 }

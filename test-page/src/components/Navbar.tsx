@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import CarSelectDesktop, { CarSelectMobile, useCarSelect } from './CarSelect'
 import FilterBar from './FilterBar'
+import TyreFilter from './TyreFilter'
 
 export default function Navbar() {
   const { clearCar } = useCarSelect()
@@ -55,13 +56,13 @@ export default function Navbar() {
       </div>
 
       {/* Mobile car select inside navbar for mobile only!! */}
-      <div className="mt-4 md:mt-0">
-        <CarSelectMobile />
-      </div>
+      <CarSelectMobile />
       </div>
       
       {/* Filter Bar - shows only when car is selected */}
       <FilterBar />
+  {/* TyreFilter positioned under the FilterBar inside the navbar */}
+  <TyreFilter />
     </nav>
   )
 }

@@ -5,6 +5,31 @@ import { createContext, useContext, useState, useRef, useEffect, type ReactNode 
 import { motion, AnimatePresence } from 'framer-motion'
 import { type CarSelection } from '../data/navbarMock'
 
+// Custom hook for scroll direction detection
+function useScrollDirection() {
+  const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  useEffect(() => {
+    const updateScrollDirection = () => {
+      const scrollY = window.scrollY
+      const direction = scrollY > lastScrollY ? 'down' : 'up'
+      
+      if (direction !== scrollDirection && (scrollY - lastScrollY > 10 || scrollY - lastScrollY < -10)) {
+        setScrollDirection(direction)
+      }
+      setLastScrollY(scrollY > 0 ? scrollY : 0)
+    }
+
+    const onScroll = () => window.requestAnimationFrame(updateScrollDirection)
+    window.addEventListener('scroll', onScroll)
+    
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [scrollDirection, lastScrollY])
+
+  return scrollDirection
+}
+
 type CarSelectContextValue = {
   currentCar: CarSelection | null
   setCurrentCar: (c: CarSelection | null) => void
@@ -258,11 +283,60 @@ export function CarSelectMobile() {
     mobileDropdownRef,
   } = useCarSelect()
 
+  const scrollDirection = useScrollDirection()
+  const [isVisible, setIsVisible] = useState(true)
+  const [forceVisible, setForceVisible] = useState(false)
+
+  useEffect(() => {
+    if (scrollDirection === 'down' && !isDropdownOpen && !forceVisible) {
+      setIsVisible(false)
+    } else if (scrollDirection === 'up' || isDropdownOpen || forceVisible) {
+      setIsVisible(true)
+    }
+  }, [scrollDirection, isDropdownOpen, forceVisible])
+
+  // Reset force visible after dropdown closes
+  useEffect(() => {
+    if (!isDropdownOpen) {
+      const timer = setTimeout(() => setForceVisible(false), 500)
+      return () => clearTimeout(timer)
+    }
+  }, [isDropdownOpen])
+
+  const handleCarSelectClick = () => {
+    if (!isVisible) {
+      setForceVisible(true)
+    }
+    setIsDropdownOpen(!isDropdownOpen)
+  }
+
   return (
-    <div className="relative w-full md:hidden" ref={mobileDropdownRef}>
+    <motion.div 
+      className="relative w-full md:hidden"
+      ref={mobileDropdownRef}
+      initial={{ height: 'auto', marginTop: 16 }}
+      animate={{ 
+        height: isVisible ? 'auto' : 0,
+        marginTop: isVisible ? 16 : 0,
+        opacity: isVisible ? 1 : 0
+      }}
+      transition={{ 
+        duration: 0.3, 
+        ease: "easeInOut",
+        height: { duration: 0.3 },
+        marginTop: { duration: 0.3 },
+        opacity: { duration: 0.2 }
+      }}
+      style={{ overflow: isVisible ? 'visible' : 'hidden' }}
+    >
       <motion.div 
         className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onClick={handleCarSelectClick}
+        animate={{ 
+          scale: isVisible ? 1 : 0.95,
+          y: isVisible ? 0 : -10
+        }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
       >
         <div className="flex items-center justify-between">
           <div>
@@ -380,7 +454,7 @@ export function CarSelectMobile() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   )
 }
 
