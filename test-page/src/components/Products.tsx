@@ -114,7 +114,7 @@ function ProductCard({ product }: { product: TireProduct }) {
         <div className="flex items-center gap-2">
           <div className="flex items-center">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium ml-1">{product.rating}</span>
+            <span className="text-sm font-medium ml-1 text-black">{product.rating}</span>
           </div>
           <span className="text-sm text-gray-500">({product.reviews})</span>
         </div>
