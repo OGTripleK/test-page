@@ -97,7 +97,7 @@ export const pageMock: PageMock = {
       rating: 4.9,
       reviews: 1024,
       attributes: { comfort: 5, handling: 5, fuelEconomy: 4, durability: 5, noise: 5 },
-      tags: [],
+      tags: ['รถ EV', 'ประหยัดน้ำมัน', 'Run Flat'],
       price: 4120,
       oldPrice: 4500,
       discountPercent: 8,

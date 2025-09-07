@@ -102,7 +102,7 @@ export default function TyreFilter() {
       animate={{ opacity: 1, height: 'auto' }}
       transition={{ duration: 0.3 }}
     >
-      <div className="max-w-4xl mx-auto px-4 py-4">
+  <div className="max-w-4xl mx-auto px-4 md:px-0 py-4">
         <div className="grid grid-cols-3 gap-4">
           {/* ยี่ห้อยาง - Tire Brand */}
           <Select 

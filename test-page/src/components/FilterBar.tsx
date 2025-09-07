@@ -256,7 +256,7 @@ export default function FilterBar() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div className="max-w-4xl mx-auto px-4">
+  <div className="max-w-4xl mx-auto px-4 md:px-0">
         <div className="flex items-center">
           <Tabs
             selectedKey={selectedFilter}

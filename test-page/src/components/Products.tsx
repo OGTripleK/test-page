@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
+import { CircularProgress } from '@heroui/react'
 import { useFilterBar } from './FilterBar'
 import { TireProduct } from '../data/pageMock'
 import { CarSelection } from '../data/navbarMock'
@@ -20,19 +21,19 @@ function ProductCard({ product }: { product: TireProduct }) {
   // Determine attribute labels in Thai
   const getAttributeLabel = (key: string) => {
     const labels: { [key: string]: string } = {
-      comfort: 'นุ่มนวล',
-      handling: 'การควบคุม', 
+      comfort: 'นุ่มเงียบ',
+      handling: 'การควบคุม',
       fuelEconomy: 'ประหยัดน้ำมัน',
-      durability: 'ความทนทาน',
+      durability: 'ทนทาน',
       noise: 'ลดเสียงรบกวน'
     }
     return labels[key] || key
   }
 
-  // Get the main attributes to display (limit to 4)
+  // Get the main attributes to display (limit to 5)
   const mainAttributes = Object.entries(product.attributes)
     .filter(([_, value]) => value && value > 0)
-    .slice(0, 4)
+    .slice(0, 5)
   
   return (
     <motion.div
@@ -119,14 +120,24 @@ function ProductCard({ product }: { product: TireProduct }) {
           <span className="text-sm text-gray-500">({product.reviews})</span>
         </div>
 
-        {/* Attribute Icons with Ratings */}
-        <div className="flex items-center justify-between">
+  {/* Attribute Icons with Ratings */}
+  <div className="flex items-start justify-between">
           {mainAttributes.map(([key, value], index) => (
             <div key={key} className="flex flex-col items-center gap-1">
-              {/* Circle with number */}
-              <div className="w-8 h-8 bg-gray-800 text-white rounded-full flex items-center justify-center text-sm font-medium">
-                {value}
+              {/* Circular progress from HeroUI showing rating (1-5) */}
+              <div className="relative w-8 h-8">
+                <CircularProgress
+                  value={Math.round((value / 5) * 100)}
+                  className="w-8 h-8"
+                  color="default"
+                  classNames={{ indicator: 'text-black', track: 'text-gray-200', value: 'text-black' }}
+                  aria-label={`${getAttributeLabel(key)} ${value} จาก 5`}
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium text-black">
+                  {value}
+                </span>
               </div>
+
               {/* Label */}
               <span className="text-xs text-gray-600 text-center leading-tight max-w-[60px]">
                 {getAttributeLabel(key)}
@@ -190,7 +201,7 @@ export default function Products({ products, selectedCar, filterType }: Products
   // If no selected car, show skeleton or nothing
   if (!actualSelectedCar) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-6">
+  <div className="max-w-4xl mx-auto px-4 md:px-0 py-6">
         {/* Skeleton Header */}
         <div className="mb-6">
           <div className="h-6 bg-gray-200 rounded-lg w-64 mb-2 animate-pulse"></div>
@@ -229,12 +240,12 @@ export default function Products({ products, selectedCar, filterType }: Products
                   <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
                 </div>
 
-                {/* Attributes Skeleton */}
-                <div className="grid grid-cols-2 gap-2">
-                  {Array.from({ length: 4 }).map((_, attrIndex) => (
-                    <div key={attrIndex} className="flex justify-between">
-                      <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded w-12 animate-pulse"></div>
+                {/* Attributes Skeleton (show 5 placeholders to match design) */}
+                <div className="flex items-start justify-between">
+                  {Array.from({ length: 5 }).map((_, attrIndex) => (
+                    <div key={attrIndex} className="flex flex-col items-center gap-1">
+                      <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
+                      <div className="h-3 bg-gray-200 rounded w-12 animate-pulse mt-1"></div>
                     </div>
                   ))}
                 </div>
@@ -289,17 +300,7 @@ export default function Products({ products, selectedCar, filterType }: Products
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          ยางสำหรับ {actualSelectedCar.title}
-        </h2>
-        <p className="text-sm text-gray-600">
-          ขนาดยาง: {actualSelectedCar.tireSize} • พบ {filteredProducts.length} รายการ
-        </p>
-      </div>
-
+  <div className="max-w-4xl mx-auto px-4 md:px-0 py-6">
       {/* Products Grid */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
