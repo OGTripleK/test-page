@@ -15,6 +15,7 @@ type CarSelectContextValue = {
   filteredCars: CarSelection[]
   handleCarSelect: (c: CarSelection) => void
   clearSearch: () => void
+  clearCar: () => void
   desktopDropdownRef: React.RefObject<HTMLDivElement | null>
   mobileDropdownRef: React.RefObject<HTMLDivElement | null>
 }
@@ -69,6 +70,12 @@ export function CarSelectProvider({ children }: { children: ReactNode }) {
 
   const clearSearch = () => setSearchQuery('')
 
+  const clearCar = () => {
+    setCurrentCar(null)
+    setIsDropdownOpen(false)
+    setSearchQuery('')
+  }
+
   return (
     <CarSelectContext.Provider value={{
       currentCar,
@@ -80,6 +87,7 @@ export function CarSelectProvider({ children }: { children: ReactNode }) {
       filteredCars,
       handleCarSelect,
       clearSearch,
+      clearCar,
       desktopDropdownRef,
       mobileDropdownRef,
     }}>
@@ -94,6 +102,8 @@ function useCarSelect() {
   return ctx
 }
 
+export { useCarSelect }
+
 export function CarSelectDesktop() {
   const {
     currentCar,
@@ -104,6 +114,7 @@ export function CarSelectDesktop() {
     filteredCars,
     handleCarSelect,
     clearSearch,
+    clearCar,
     desktopDropdownRef,
   } = useCarSelect()
 
@@ -119,6 +130,19 @@ export function CarSelectDesktop() {
             <p className="text-xs text-gray-600 truncate">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
           </div>
           <div className="flex items-center space-x-2 ml-2">
+            {currentCar && (
+              <motion.button 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearCar()
+                }}
+                className="p-1 hover:bg-gray-300 rounded-lg transition-colors"
+                whileTap={{ scale: 0.95 }}
+                title="ล้างการเลือกรถ"
+              >
+                <X className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+              </motion.button>
+            )}
             <motion.button 
               className="p-1 hover:bg-gray-300 rounded-lg transition-colors"
               whileTap={{ scale: 0.95 }}
@@ -230,6 +254,7 @@ export function CarSelectMobile() {
     filteredCars,
     handleCarSelect,
     clearSearch,
+    clearCar,
     mobileDropdownRef,
   } = useCarSelect()
 
@@ -245,6 +270,19 @@ export function CarSelectMobile() {
             <p className="text-sm text-gray-600">{currentCar ? currentCar.subtitle : 'โปรดเลือกรุ่นรถยนต์'}</p>
           </div>
           <div className="flex items-center space-x-2">
+            {currentCar && (
+              <motion.button 
+                onClick={(e) => {
+                  e.stopPropagation()
+                  clearCar()
+                }}
+                className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
+                whileTap={{ scale: 0.95 }}
+                title="ล้างการเลือกรถ"
+              >
+                <X className="w-5 h-5 text-gray-500 hover:text-gray-700" />
+              </motion.button>
+            )}
             <motion.button 
               className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
               whileTap={{ scale: 0.95 }}
