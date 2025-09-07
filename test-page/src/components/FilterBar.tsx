@@ -265,7 +265,7 @@ export default function FilterBar() {
             classNames={{
               base: "w-full",
               // make the tab list horizontally scrollable on small screens
-              tabList: "gap-8 w-full relative rounded-none p-0 border-b-0 bg-transparent overflow-x-auto flex-nowrap whitespace-nowrap scrollbar-hide",
+              tabList: "w-full relative rounded-none p-0 border-b-0 bg-transparent overflow-x-auto flex-nowrap whitespace-nowrap scrollbar-hide",
               cursor: "w-full bg-black h-[2px] rounded-none bottom-0",
               // keep each tab from shrinking so they can be scrolled horizontally
               tab: "max-w-fit px-2 h-12 flex items-center bg-transparent data-[hover-unselected=true]:opacity-80 flex-shrink-0",
