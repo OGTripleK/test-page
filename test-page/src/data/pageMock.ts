@@ -14,7 +14,6 @@ export type Filter = {
 export type GuideCard = {
   id: string
   author: string
-  role?: string
   avatar?: string
   message: string
   ctaLabel?: string
@@ -47,6 +46,7 @@ export type PageMock = {
   tabs: Tab[]
   filters: Filter[]
   guide: GuideCard
+  guideMap?: { [carId: string]: GuideCard }
   products: TireProduct[]
 }
 
@@ -65,11 +65,92 @@ export const pageMock: PageMock = {
   guide: {
     id: 'guide-22',
     author: '22 Guide',
-    role: 'ผู้เชี่ยวชาญ',
-    avatar: '/images/guide-avatar.png',
+  avatar: '/repairman.svg',
     message:
       'จากรีวิวของลูกค้า แนะนำว่าสำหรับรถ Honda Accord คนส่วนใหญ่จะเลือกใช้ยาง Michelin เพราะมีคุณสมบัติเงียบมาก ขับทางไกลแทบไม่ได้ยินเสียงยางเลย เกาะถนนดี แม้ฝนตกก็ยังรู้สึกมั่นใจ ตอนนี้ใช้มา 15,000 กม. ยังนุ่มเหมือนเดิม แต่ถ้าหากอยากได้ความคุ้มค่า แนะนำยาง Yokohama ครับ',
     ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+  },
+
+  // Per-car guide suggestions (mock data keyed by car id)
+  // Keys should match ids in `carOptions` from navbarMock (e.g. 'car-1')
+  // These are optional and used to show car-specific recommendations.
+  // Keep short, localized messages focused on the selected car.
+  guideMap: {
+    'car-1': {
+      id: 'guide-accord',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message:
+        'จากรีวิวของลูกค้า แนะนำว่าสำหรับรถ Honda Accord คนส่วนใหญ่จะเลือกใช้ยาง Michelin เพราะมีคุณสมบัติ เงียบมาก ขับทางไกลแทบไม่ได้ยินเสียงยางเลย เกาะถนนดี แม้ฝนตกก็ยังรู้สึกมั่นใจ ตอนนี้ใช้มา 15,000 กม. ยังนุ่มเหมือนเดิม แต่ถ้าหากอยากได้ความคุ้มค่า แนะนำยาง Yokohama ครับ',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-2': {
+      id: 'guide-corolla',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message:
+        'Toyota Corolla (195/65R15): ยางที่เน้นความประหยัดน้ำมันและความนุ่ม เช่น Michelin Energy หรือ Yokohama BluEarth จะตอบโจทย์การใช้งานในเมือง',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-3': {
+      id: 'guide-bmw',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message:
+        'BMW 3 Series (225/45R18): แนะนำยางสมรรถนะสูง เช่น Michelin Pilot Sport สำหรับการควบคุมและการตอบสนองที่ดี',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-4': {
+      id: 'guide-tesla',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message:
+        'Tesla Model 3 (235/45R18): ควรเลือกยางที่ออกแบบมาสำหรับรถไฟฟ้าและความประหยัด เช่น Michelin Pilot Sport EV หรือ Continental EcoContact',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    // Generic fallback entries for other cars
+    'car-5': {
+      id: 'guide-civic',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Honda Civic (215/55R16): ยางที่สมดุลทั้งความนุ่มและการควบคุม เช่น Michelin Primacy',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-6': {
+      id: 'guide-cx5',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Mazda CX-5 (225/55R19): ยาง SUV ที่ให้ความสบายและการเกาะถนน เช่น Michelin Latitude หรือ Bridgestone Dueler',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-7': {
+      id: 'guide-navara',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Nissan Navara (265/60R18): ถ้าขับใช้งานทุกวัน แนะนำ All-Terrain ที่ทนทานและเกาะถนนดี',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-8': {
+      id: 'guide-camry',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Toyota Camry Hybrid (215/55R17): ยางที่เน้นประหยัดน้ำมันและความนุ่ม เช่น Michelin Energy',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-9': {
+      id: 'guide-ranger',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Ford Ranger (265/65R17): สำหรับงานหนักและทางไกล ให้พิจารณายาง H/T หรือ A/T ที่ทนทาน',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
+    'car-10': {
+      id: 'guide-c200',
+      author: '22 Guide',
+      avatar: '/repairman.svg',
+      message: 'Mercedes C200 (225/50R17): ยางกลุ่มพรีเมียมที่เน้นความสบายและสมรรถนะ เช่น Continental หรือ Michelin Primacy',
+      ctaLabel: 'ปรึกษาผู้เชี่ยวชาญ',
+    },
   },
   products: [
     // Products for Honda Accord 2025 - 225/50R17

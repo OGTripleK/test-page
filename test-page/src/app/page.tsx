@@ -12,8 +12,8 @@ function PageContent() {
   
   return (
     <FilterBarProvider products={pageMock.products} selectedCar={currentCar}>
-      <Navbar />
-      <Products />
+  <Navbar />
+  <Products />
     </FilterBarProvider>
   )
 }

@@ -1,4 +1,4 @@
-'use client'
+ 'use client'
 
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
@@ -8,6 +8,8 @@ import { TireProduct } from '../data/pageMock'
 import { CarSelection } from '../data/navbarMock'
 import { useCart } from '../app/providers'
 import { useState } from 'react'
+import GuideCard from './GuideCard'
+import { pageMock } from '../data/pageMock'
 
 type FilterType = 'all' | 'popular' | 'price_low_high' | 'price_high_low'
 
@@ -247,81 +249,25 @@ export default function Products({ products, selectedCar, filterType }: Products
   const actualSelectedCar = selectedCar !== undefined ? selectedCar : context.selectedCar
   const actualFilterType = filterType || context.selectedFilter
 
-  // If no selected car, show skeleton or nothing
+  // If no selected car, show hint text
   if (!actualSelectedCar) {
     return (
-  <div className="max-w-4xl mx-auto px-4 md:px-0 py-6">
-        {/* Skeleton Header */}
-        <div className="mb-6">
-          <div className="h-6 bg-gray-200 rounded-lg w-64 mb-2 animate-pulse"></div>
-          <div className="h-4 bg-gray-200 rounded w-48 animate-pulse"></div>
-        </div>
-
-        {/* Skeleton Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <motion.div
-              key={index}
-              className="bg-white border border-gray-200 rounded-lg p-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.1 }}
-            >
-              <div className="space-y-3">
-                {/* Brand and Tags Skeleton */}
-                <div className="flex items-center justify-between">
-                  <div className="h-5 bg-gray-200 rounded w-20 animate-pulse"></div>
-                  <div className="flex gap-1">
-                    <div className="h-5 bg-gray-200 rounded w-12 animate-pulse"></div>
-                    <div className="h-5 bg-gray-200 rounded w-16 animate-pulse"></div>
-                  </div>
-                </div>
-
-                {/* Product Name Skeleton */}
-                <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
-
-                {/* Rating Skeleton */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <div className="w-4 h-4 bg-gray-200 rounded animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-8 animate-pulse"></div>
-                  </div>
-                  <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
-                </div>
-
-                {/* Attributes Skeleton (show 5 placeholders to match design) */}
-                <div className="flex items-start justify-between">
-                  {Array.from({ length: 5 }).map((_, attrIndex) => (
-                    <div key={attrIndex} className="flex flex-col items-center gap-1">
-                      <div className="h-8 w-8 rounded-full bg-gray-200 animate-pulse"></div>
-                      <div className="h-3 bg-gray-200 rounded w-12 animate-pulse mt-1"></div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Price Skeleton */}
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <div className="h-6 bg-gray-200 rounded w-20 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-16 animate-pulse"></div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 bg-gray-200 rounded w-24 animate-pulse"></div>
-                    <div className="h-4 bg-gray-200 rounded w-12 animate-pulse"></div>
-                  </div>
-                </div>
-
-                {/* Popular Badge Skeleton */}
-                <div className="text-center">
-                  <div className="h-6 bg-gray-200 rounded-full w-20 mx-auto animate-pulse"></div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+      <div className="max-w-4xl mx-auto px-4 md:px-0 py-6">
+        {/* Hint Text */}
+        <div className="text-center mb-6">
+          <p className="text-gray-600 text-lg font-medium">
+            กรุณาเลือกรถก่อนเพื่อดูยางที่เหมาะสมกับรถของคุณ
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            เลือกรถของคุณเพื่อแสดงรายการยางที่ตรงกับขนาดและประเภทรถ
+          </p>
         </div>
       </div>
     )
   }
+
+  // Pick guide specific to selected car if available
+  const selectedGuide = actualSelectedCar && (pageMock.guideMap?.[actualSelectedCar.id as string] ?? pageMock.guide)
 
   // Filter products based on selected car and filter type
   let filteredProducts = actualProducts.filter(product => 
@@ -349,7 +295,15 @@ export default function Products({ products, selectedCar, filterType }: Products
   }
 
   return (
-  <div className="max-w-4xl mx-auto px-4 md:px-0 py-6">
+  <div className="max-w-4xl mx-auto px-4 md:px-0 pt-2 pb-6">
+      {/* Guide - only show when a car is selected */}
+      {actualSelectedCar && selectedGuide && (
+        <div className="mb-4">
+          <div className="w-full">
+            <GuideCard guide={selectedGuide} />
+          </div>
+        </div>
+      )}
       {/* Products Grid */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
