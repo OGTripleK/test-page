@@ -3,6 +3,7 @@
 import { Select, SelectItem } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { useFilterBar } from './FilterBar'
+import type { SharedSelection } from '@heroui/react'
 
 // Options are derived dynamically from available products (not hardcoded)
 
@@ -12,7 +13,7 @@ export default function TyreFilter() {
   // Don't show tyre filter if no car is selected
   if (!selectedCar) return null
 
-  const handleBrandChange = (keys: any) => {
+  const handleBrandChange = (keys: SharedSelection) => {
   const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
@@ -20,7 +21,7 @@ export default function TyreFilter() {
     })
   }
 
-  const handlePriceChange = (keys: any) => {
+  const handlePriceChange = (keys: SharedSelection) => {
   const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
@@ -28,7 +29,7 @@ export default function TyreFilter() {
     })
   }
 
-  const handleFeatureChange = (keys: any) => {
+  const handleFeatureChange = (keys: SharedSelection) => {
   const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
@@ -107,6 +108,7 @@ export default function TyreFilter() {
           <Select 
             className="max-w-full" 
             label="ยี่ห้อยาง"
+            items={[{ key: 'all', label: 'ทั้งหมด' }, ...tireBrands]}
             selectedKeys={tyreFilterSelections.brand ? [tyreFilterSelections.brand] : []}
             onSelectionChange={handleBrandChange}
             classNames={{
@@ -117,16 +119,16 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
-            {(tireBrands.map((brand) => (
-              <SelectItem key={brand.key} className="text-black whitespace-nowrap">{brand.label}</SelectItem>
-            )) as unknown) as any}
+            {(item) => (
+              <SelectItem key={item.key} className="text-black whitespace-nowrap">{item.label}</SelectItem>
+            )}
           </Select>
 
           {/* ราคา - Price Range */}
           <Select 
             className="max-w-full" 
             label="ราคา"
+            items={[{ key: 'all', label: 'ทั้งหมด' }, ...priceRanges]}
             selectedKeys={tyreFilterSelections.priceRange ? [tyreFilterSelections.priceRange] : []}
             onSelectionChange={handlePriceChange}
             classNames={{
@@ -137,16 +139,16 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
-            {(priceRanges.map((price) => (
-              <SelectItem key={price.key} className="text-black whitespace-nowrap">{price.label}</SelectItem>
-            )) as unknown) as any}
+            {(item) => (
+              <SelectItem key={item.key} className="text-black whitespace-nowrap">{item.label}</SelectItem>
+            )}
           </Select>
 
           {/* คุณสมบัติ - Features */}
           <Select 
             className="max-w-full" 
             label="คุณสมบัติ"
+            items={[{ key: 'all', label: 'ทั้งหมด' }, ...features]}
             selectedKeys={tyreFilterSelections.feature ? [tyreFilterSelections.feature] : []}
             onSelectionChange={handleFeatureChange}
             classNames={{
@@ -157,10 +159,9 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
-            {(features.map((feature) => (
-              <SelectItem key={feature.key} className="text-black whitespace-nowrap">{feature.label}</SelectItem>
-            )) as unknown) as any}
+            {(item) => (
+              <SelectItem key={item.key} className="text-black whitespace-nowrap">{item.label}</SelectItem>
+            )}
           </Select>
         </div>
       </div>
