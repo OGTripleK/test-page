@@ -4,46 +4,16 @@ import { Select, SelectItem } from '@heroui/react'
 import { motion } from 'framer-motion'
 import { useFilterBar } from './FilterBar'
 
-// Mock data for the select options
-const tireBrands = [
-  { key: 'michelin', label: 'Michelin' },
-  { key: 'bridgestone', label: 'Bridgestone' },
-  { key: 'goodyear', label: 'Goodyear' },
-  { key: 'pirelli', label: 'Pirelli' },
-  { key: 'continental', label: 'Continental' },
-  { key: 'yokohama', label: 'Yokohama' },
-  { key: 'dunlop', label: 'Dunlop' },
-  { key: 'falken', label: 'Falken' }
-]
-
-const priceRanges = [
-  { key: '0-2000', label: '0 - 2,000 บาท' },
-  { key: '2000-4000', label: '2,000 - 4,000 บาท' },
-  { key: '4000-6000', label: '4,000 - 6,000 บาท' },
-  { key: '6000-8000', label: '6,000 - 8,000 บาท' },
-  { key: '8000-10000', label: '8,000 - 10,000 บาท' },
-  { key: '10000+', label: '10,000+ บาท' }
-]
-
-const features = [
-  { key: 'eco-friendly', label: 'ประหยัดน้ำมัน' },
-  { key: 'wet-grip', label: 'เกาะถนนเปียก' },
-  { key: 'low-noise', label: 'เงียบ' },
-  { key: 'long-lasting', label: 'ทนทาน' },
-  { key: 'all-season', label: 'ใช้ได้ทุกฤดู' },
-  { key: 'sport', label: 'สปอร์ต' },
-  { key: 'comfort', label: 'นุ่มสบาย' },
-  { key: 'off-road', label: 'วิ่งออฟโรด' }
-]
+// Options are derived dynamically from available products (not hardcoded)
 
 export default function TyreFilter() {
-  const { selectedCar, tyreFilterSelections, setTyreFilterSelections } = useFilterBar()
+  const { selectedCar, tyreFilterSelections, setTyreFilterSelections, filteredProducts } = useFilterBar()
 
   // Don't show tyre filter if no car is selected
   if (!selectedCar) return null
 
   const handleBrandChange = (keys: any) => {
-    const selectedKey = keys.currentKey || null
+  const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
       brand: selectedKey
@@ -51,7 +21,7 @@ export default function TyreFilter() {
   }
 
   const handlePriceChange = (keys: any) => {
-    const selectedKey = keys.currentKey || null
+  const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
       priceRange: selectedKey
@@ -59,12 +29,70 @@ export default function TyreFilter() {
   }
 
   const handleFeatureChange = (keys: any) => {
-    const selectedKey = keys.currentKey || null
+  const selectedKey = keys.currentKey === 'all' ? null : keys.currentKey || null
     setTyreFilterSelections({
       ...tyreFilterSelections,
       feature: selectedKey
     })
   }
+
+  // Derive options dynamically from filteredProducts
+  const tireBrands = Array.from(new Set(filteredProducts.map(p => p.brand))).map(b => ({ key: b.toLowerCase(), label: b }))
+
+  // Determine which price ranges are actually represented in the products
+  const PRICE_BUCKETS = [
+    { key: '0-2000', label: '0 - 2,000 บาท', min: 0, max: 2000 },
+    { key: '2000-4000', label: '2,000 - 4,000 บาท', min: 2000, max: 4000 },
+    { key: '4000-6000', label: '4,000 - 6,000 บาท', min: 4000, max: 6000 },
+    { key: '6000-8000', label: '6,000 - 8,000 บาท', min: 6000, max: 8000 },
+    { key: '8000-10000', label: '8,000 - 10,000 บาท', min: 8000, max: 10000 },
+    { key: '10000+', label: '10,000+ บาท', min: 10000, max: Infinity },
+  ]
+
+  const priceRanges = PRICE_BUCKETS.filter(bucket =>
+    filteredProducts.some(p => p.price >= bucket.min && p.price <= bucket.max)
+  )
+
+  // Features are mapped via same map used in FilterBar.tsx so options are consistent
+  const featureMap: { key: string; label: string }[] = [
+    { key: 'eco-friendly', label: 'ประหยัดน้ำมัน' },
+    { key: 'wet-grip', label: 'เกาะถนนเปียก' },
+    { key: 'low-noise', label: 'เงียบ' },
+    { key: 'long-lasting', label: 'ทนทาน' },
+    { key: 'all-season', label: 'ใช้ได้ทุกฤดู' },
+    { key: 'sport', label: 'สปอร์ต' },
+    { key: 'comfort', label: 'นุ่มสบาย' },
+    { key: 'off-road', label: 'วิ่งออฟโรด' }
+  ]
+
+  // Only include features that match at least one product (by tags or attributes)
+  const features = featureMap.filter(f => {
+    // tags-based features
+    const tagMap: { [k: string]: string[] } = {
+      'eco-friendly': ['ประหยัดน้ำมัน'],
+      'sport': ['Performance'],
+      'off-road': ['All Terrain', 'SUV', 'Pickup']
+    }
+
+    const tags = tagMap[f.key] || []
+    if (tags.length > 0) {
+      return filteredProducts.some(p => p.tags?.some(t => tags.includes(t)))
+    }
+
+    // attribute-based features (require attribute >= 4)
+    const attributeMap: { [k: string]: keyof typeof filteredProducts[number]['attributes'] } = {
+      'wet-grip': 'handling',
+      'low-noise': 'noise',
+      'long-lasting': 'durability',
+      'all-season': 'comfort',
+      'comfort': 'comfort'
+    }
+
+    const attr = attributeMap[f.key]
+    if (attr) return filteredProducts.some(p => (p.attributes[attr] || 0) >= 4)
+
+    return false
+  })
 
   return (
     <motion.div 
@@ -89,9 +117,10 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            {tireBrands.map((brand) => (
+            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
+            {(tireBrands.map((brand) => (
               <SelectItem key={brand.key} className="text-black whitespace-nowrap">{brand.label}</SelectItem>
-            ))}
+            )) as unknown) as any}
           </Select>
 
           {/* ราคา - Price Range */}
@@ -108,9 +137,10 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            {priceRanges.map((price) => (
+            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
+            {(priceRanges.map((price) => (
               <SelectItem key={price.key} className="text-black whitespace-nowrap">{price.label}</SelectItem>
-            ))}
+            )) as unknown) as any}
           </Select>
 
           {/* คุณสมบัติ - Features */}
@@ -127,9 +157,10 @@ export default function TyreFilter() {
               popoverContent: "w-fit"
             }}
           >
-            {features.map((feature) => (
+            <SelectItem key="all" className="text-black whitespace-nowrap">ทั้งหมด</SelectItem>
+            {(features.map((feature) => (
               <SelectItem key={feature.key} className="text-black whitespace-nowrap">{feature.label}</SelectItem>
-            ))}
+            )) as unknown) as any}
           </Select>
         </div>
       </div>
