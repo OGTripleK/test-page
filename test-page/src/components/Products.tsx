@@ -4,6 +4,15 @@ import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
 import { useFilterBar } from './FilterBar'
 import { TireProduct } from '../data/pageMock'
+import { CarSelection } from '../data/navbarMock'
+
+type FilterType = 'all' | 'popular' | 'price_low_high' | 'price_high_low'
+
+interface ProductsProps {
+  products?: TireProduct[]
+  selectedCar?: CarSelection | null
+  filterType?: FilterType
+}
 
 function ProductCard({ product }: { product: TireProduct }) {
   const discountAmount = product.oldPrice ? product.oldPrice - product.price : 0
@@ -110,10 +119,15 @@ function ProductCard({ product }: { product: TireProduct }) {
   )
 }
 
-export default function Products() {
-  const { filteredProducts, selectedCar, selectedFilter } = useFilterBar()
+export default function Products({ products, selectedCar, filterType }: ProductsProps) {
+  // If props are provided, use them; otherwise, use context
+  const context = useFilterBar()
+  const actualProducts = products || context.filteredProducts
+  const actualSelectedCar = selectedCar !== undefined ? selectedCar : context.selectedCar
+  const actualFilterType = filterType || context.selectedFilter
 
-  if (!selectedCar) {
+  // If no selected car, show skeleton or nothing
+  if (!actualSelectedCar) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Skeleton Header */}
@@ -188,15 +202,40 @@ export default function Products() {
     )
   }
 
+  // Filter products based on selected car and filter type
+  let filteredProducts = actualProducts.filter(product => 
+    product.compatibleTireSize === actualSelectedCar.tireSize
+  )
+
+  // Apply sorting based on filter type
+  switch (actualFilterType) {
+    case 'all':
+      // No additional sorting
+      break
+    case 'popular':
+      filteredProducts = filteredProducts
+        .filter(product => product.isPopular)
+        .sort((a, b) => b.reviews - a.reviews)
+      break
+    case 'price_low_high':
+      filteredProducts = filteredProducts.sort((a, b) => a.price - b.price)
+      break
+    case 'price_high_low':
+      filteredProducts = filteredProducts.sort((a, b) => b.price - a.price)
+      break
+    default:
+      break
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Header */}
       <div className="mb-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-2">
-          ยางสำหรับ {selectedCar.title}
+          ยางสำหรับ {actualSelectedCar.title}
         </h2>
         <p className="text-sm text-gray-600">
-          ขนาดยาง: {selectedCar.tireSize} • พบ {filteredProducts.length} รายการ
+          ขนาดยาง: {actualSelectedCar.tireSize} • พบ {filteredProducts.length} รายการ
         </p>
       </div>
 
@@ -210,9 +249,7 @@ export default function Products() {
       ) : (
         <div className="text-center py-12">
           <p className="text-gray-500">
-            ไม่พบยางที่เหมาะสมสำหรับการค้นหา "{selectedFilter === 'all' ? 'ทั้งหมด' : 
-            selectedFilter === 'popular' ? 'ยอดนิยม' : 
-            selectedFilter === 'price_low_high' ? 'ราคา: ต่ำ ไป สูง' : 'ราคา: สูง ไป ต่ำ'}"
+            ไม่พบยางที่เหมาะสมสำหรับการค้นหา
           </p>
         </div>
       )}

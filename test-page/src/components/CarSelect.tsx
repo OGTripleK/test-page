@@ -3,7 +3,7 @@
 import { Search, X, Settings2 } from 'lucide-react'
 import { createContext, useContext, useState, useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { carOptions, type CarSelection } from '../data/navbarMock'
+import { type CarSelection } from '../data/navbarMock'
 
 type CarSelectContextValue = {
   currentCar: CarSelection | null
@@ -22,7 +22,7 @@ type CarSelectContextValue = {
 
 const CarSelectContext = createContext<CarSelectContextValue | null>(null)
 
-export function CarSelectProvider({ children }: { children: ReactNode }) {
+export function CarSelectProvider({ children, carOptions }: { children: ReactNode, carOptions: CarSelection[] }) {
   const [currentCar, setCurrentCar] = useState<CarSelection | null>(null)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')

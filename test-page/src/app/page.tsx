@@ -5,6 +5,7 @@ import Products from '../components/Products'
 import { CarSelectProvider, useCarSelect } from '../components/CarSelect'
 import { FilterBarProvider } from '../components/FilterBar'
 import { pageMock } from '../data/pageMock'
+import { carOptions } from '../data/navbarMock'
 
 function PageContent() {
   const { currentCar } = useCarSelect()
@@ -20,7 +21,7 @@ function PageContent() {
 export default function Home() {
   return (
     <div className="bg-white min-h-screen">
-      <CarSelectProvider>
+      <CarSelectProvider carOptions={carOptions}>
         <PageContent />
       </CarSelectProvider>
     </div>
