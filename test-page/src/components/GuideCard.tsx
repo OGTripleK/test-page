@@ -19,7 +19,7 @@ export default function GuideCard({ guide }: { guide: GuideData }) {
         {guide.ctaLabel && (
           <button
             type="button"
-            className="flex items-center gap-2 border border-orange-400 text-orange-500 px-4 py-2 rounded-full font-medium"
+            className="flex items-center gap-2 border border-orange-400 text-orange-500 px-4 py-2 rounded-[12px] font-medium"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12v5a2 2 0 0 1-2 2H5l-4 4V6a2 2 0 0 1 2-2h14" />
