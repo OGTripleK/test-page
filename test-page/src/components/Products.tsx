@@ -57,7 +57,7 @@ function ProductCard({ product }: { product: TireProduct }) {
   
   return (
     <motion.div
-      className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative flex flex-col min-h-[500px]"
+      className="bg-white border border-gray-200 rounded-12 overflow-hidden shadow-[0_1px_4px_rgb(0_0_0_/_0.1)] hover:shadow-lg transition-shadow relative flex flex-col min-h-[500px]"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -171,7 +171,7 @@ function ProductCard({ product }: { product: TireProduct }) {
           {product.tags?.map((tag) => (
             <span 
               key={tag}
-              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded"
+              className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-8"
             >
               {tag}
             </span>
@@ -205,7 +205,7 @@ function ProductCard({ product }: { product: TireProduct }) {
         <button 
           onClick={handleAddToCart}
           disabled={isAdding}
-          className={`w-full py-3 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+          className={`w-full py-3 rounded-12 transition-colors flex items-center justify-center gap-2 ${
             added 
               ? 'bg-green-600 text-white hover:bg-green-700' 
               : 'bg-gray-800 text-white hover:bg-gray-900'

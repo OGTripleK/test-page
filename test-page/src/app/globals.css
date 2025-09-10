@@ -14,6 +14,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --radius-8: 8px;
+  --radius-12: 12px;
 }
 
 @media (prefers-color-scheme: dark) {

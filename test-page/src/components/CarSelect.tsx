@@ -149,7 +149,7 @@ export function CarSelectDesktop() {
   return (
     <div className="relative hidden md:flex md:flex-1 md:max-w-md" ref={desktopDropdownRef}>
       <motion.div 
-        className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors w-full"
+        className="bg-[#F5F5F5] rounded-12 p-3 cursor-pointer hover:bg-gray-200 transition-colors w-full"
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
         <div className="flex items-center justify-between">
@@ -184,7 +184,7 @@ export function CarSelectDesktop() {
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div 
-            className="absolute top-full left-0 right-0 mt-2 bg-[#FFFFFF] border border-gray-200 rounded-2xl shadow-lg z-50 max-h-96 overflow-hidden overflow-x-hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-[#FFFFFF] border border-gray-200 rounded-12 shadow-lg z-50 max-h-96 overflow-hidden overflow-x-hidden"
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -410,7 +410,7 @@ export function CarSelectMobile() {
       style={{ overflow: isVisible ? 'visible' : 'hidden' }}
     >
       <motion.div 
-        className="bg-[#F5F5F5] rounded-2xl p-3 cursor-pointer hover:bg-gray-200 transition-colors"
+        className="bg-[#F5F5F5] rounded-12 p-3 cursor-pointer hover:bg-gray-200 transition-colors"
         onClick={(e) => handleCarSelectClick(e)}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -456,7 +456,7 @@ export function CarSelectMobile() {
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div 
-            className="absolute top-full left-0 right-0 mt-2 bg-[#FFFFFF] border border-gray-200 rounded-2xl shadow-lg z-50 max-h-96 overflow-hidden overflow-x-hidden md:hidden"
+            className="absolute top-full left-0 right-0 mt-2 bg-[#FFFFFF] border border-gray-200 rounded-12 shadow-lg z-50 max-h-96 overflow-hidden overflow-x-hidden md:hidden"
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}

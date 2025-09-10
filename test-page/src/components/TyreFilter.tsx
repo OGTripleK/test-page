@@ -112,7 +112,7 @@ export default function TyreFilter() {
             selectedKeys={tyreFilterSelections.brand ? [tyreFilterSelections.brand] : []}
             onSelectionChange={handleBrandChange}
             classNames={{
-              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
+              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex rounded-12",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
               selectorIcon: "text-black",
@@ -132,7 +132,7 @@ export default function TyreFilter() {
             selectedKeys={tyreFilterSelections.priceRange ? [tyreFilterSelections.priceRange] : []}
             onSelectionChange={handlePriceChange}
             classNames={{
-              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
+              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex rounded-12",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
               selectorIcon: "text-black",
@@ -152,7 +152,7 @@ export default function TyreFilter() {
             selectedKeys={tyreFilterSelections.feature ? [tyreFilterSelections.feature] : []}
             onSelectionChange={handleFeatureChange}
             classNames={{
-              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex",
+              trigger: "bg-gray-100 h-10 min-h-0 py-1 px-3 flex rounded-12",
               value: "text-sm text-gray-900",
               label: "text-gray-700 font-medium",
               selectorIcon: "text-black",
